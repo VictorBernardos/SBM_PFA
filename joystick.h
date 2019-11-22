@@ -17,10 +17,10 @@
 #define SB 10
 #define BJ 11
 #define DCH 101
+#define L_CENTER 1000
 #define S_ACTIVAR 100
 
 
 void rebote_Callback (void const *arg);
 void EINT3_IRQHandler (void);
 void Init_Joy(void);
-void state(void const *argument);

@@ -7,5 +7,5 @@
 #define BUZZER_PIN 0
 
 void Init_buzzer(void);
-void buzzer_on(int frecuencia);
+void buzzer_on();
 void buzzer_off();

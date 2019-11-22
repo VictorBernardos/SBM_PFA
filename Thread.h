@@ -1,5 +1,18 @@
 #include "LPC17xx.h"
 #include "GPIO_LPC17xx.h"
 #include "PIN_LPC17xx.h"
-#include "cmsis_os.h"        
+#include "cmsis_os.h"        // CMSIS RTOS header file
+#include "lcd.h"
+#include "stdio.h"
+#include "joystick.h"
 
+
+int Init_Thread(void);
+
+void lcd(void const *argument);
+osThreadId id_lcd;
+osThreadDef (lcd, osPriorityNormal, 1, 0);
+
+void state(void const *argument);
+osThreadId id_state;
+osThreadDef (state, osPriorityNormal, 1, 0);

@@ -8,6 +8,8 @@
 #include "cmsis_os.h"
 #include "GPIO_LPC17xx.h"
 #include "PIN_LPC17xx.h"
+#include "joystick.h"
+#include "sensorTemp.h"
 
 #define PORT_LED 1
 #define PIN_LED1 18
@@ -27,9 +29,9 @@ int main (void) {
   osKernelInitialize ();                    // initialize CMSIS-RTOS
 
   // initialize peripherals here
-
+  Init_Joy();
   Init_Thread();
-
+  Init_I2C();
   osKernelStart ();                         // start thread execution 
 
   

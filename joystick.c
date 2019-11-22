@@ -1,12 +1,34 @@
-#include "LPC17xx.h"
-#include "GPIO_LPC17xx.h"
-#include "PIN_LPC17xx.h"
-#include "cmsis_os.h"    
 #include "joystick.h"
 
-void rebote_Callback (void const *arg); 
-osTimerId rebo;                                          // timer id
-osTimerDef (rebote, rebote_Callback);                    // define timers
+
+
+extern osThreadId id_state;
+
+
+void larga_Callback (void const *arg); 
+osTimerId larga;                                          // timer id
+osTimerDef (larga, larga_Callback);                    // define timers
+
+bool pulsacion_larga=false;
+
+void Init_Joy(void){
+  NVIC_EnableIRQ(EINT3_IRQn);
+  GPIO_SetDir(JOY_PORT,JOY_UP,  GPIO_DIR_INPUT);
+	GPIO_SetDir(JOY_PORT,JOY_DOWN,GPIO_DIR_INPUT);
+	GPIO_SetDir(JOY_PORT,JOY_LF,  GPIO_DIR_INPUT);
+	GPIO_SetDir(JOY_PORT,JOY_CENTER,  GPIO_DIR_INPUT);
+  GPIO_SetDir(JOY_PORT,JOY_RG,  GPIO_DIR_INPUT);
+	
+	PIN_Configure(JOY_PORT,JOY_UP,   		PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
+	PIN_Configure(JOY_PORT,JOY_DOWN, 		PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
+	PIN_Configure(JOY_PORT,JOY_LF,      PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
+	PIN_Configure(JOY_PORT,JOY_CENTER,  PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
+  PIN_Configure(JOY_PORT,JOY_RG,  PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
+	
+	LPC_GPIOINT->IO0IntEnR=((1<<JOY_CENTER)|(1<<JOY_UP)|(1<<JOY_LF)|(1<<JOY_DOWN)|(1<<JOY_RG));
+  larga  = osTimerCreate (osTimer(larga),    osTimerOnce, (void *)0);
+
+}
 
 void EINT3_IRQHandler (void){
 	///Hay que reactivar las interrupciones de cada pulsador en state_thread
@@ -38,66 +60,20 @@ void EINT3_IRQHandler (void){
 		if(LPC_GPIOINT->IO0IntStatR & (1 << JOY_CENTER)){
 			LPC_GPIOINT -> IO0IntEnR &=  ~(1 <<JOY_CENTER);	//deshabilito el que produce la interrupcion
 			LPC_GPIOINT->IO0IntClr |=  (1 <<JOY_CENTER); 
-			osSignalSet(id_state, CENTER);
+      osTimerStart(larga,1000);
+      if(pulsacion_larga){
+        pulsacion_larga=false;
+        osSignalSet(id_state, L_CENTER); 
+      }
+      else{
+          osSignalSet(id_state, CENTER);
+      }
 		}
 } 
 
 
-void Init_Joy(void){
-  GPIO_SetDir(JOY_PORT,JOY_UP,  GPIO_DIR_INPUT);
-	GPIO_SetDir(JOY_PORT,JOY_DOWN,GPIO_DIR_INPUT);
-	GPIO_SetDir(JOY_PORT,JOY_LF,  GPIO_DIR_INPUT);
-	GPIO_SetDir(JOY_PORT,JOY_CENTER,  GPIO_DIR_INPUT);
-	
-	PIN_Configure(JOY_PORT,JOY_UP,   		PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
-	PIN_Configure(JOY_PORT,JOY_DOWN, 		PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
-	PIN_Configure(JOY_PORT,JOY_LF,      PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
-	PIN_Configure(JOY_PORT,JOY_CENTER,  PIN_FUNC_0,PIN_PINMODE_PULLDOWN,PIN_PINMODE_NORMAL);
-	
-	LPC_GPIOINT->IO0IntEnR=((1<<JOY_CENTER)|(1<<JOY_UP)|(1<<JOY_LF)|(1<<JOY_DOWN));
-  rebo             = osTimerCreate (osTimer(rebote),    osTimerOnce, (void *)0);
-  if (!rebo) return(-1);
-  return 0;
+
+void larga_Callback (void const *arg){
+  pulsacion_larga=true;
 }
 
-void state(void const *argument){
-	bool pause=false;
-	while(1){
-		osEvent evento;
-		evento = osSignalWait(00,osWaitForever);
-		osTimerStart(rebo, 200);//espera 200ms
-		osSignalWait(S_ACTIVAR, osWaitForever);
-		switch(evento.value.v){
-			case CENTER:
-				LPC_GPIOINT -> IO0IntClr |= (1 << JOY_CENTER);
-				LPC_GPIOINT -> IO0IntEnR |= (1 << JOY_CENTER);
-				
-				break;
-			case BJ:
-				LPC_GPIOINT -> IO0IntClr |= (1 << JOY_DOWN);
-				LPC_GPIOINT -> IO0IntEnR |= (1 << JOY_DOWN);
-			
-			break;
-			case SB:
-				LPC_GPIOINT -> IO0IntClr |=  (1 << JOY_UP);
-				LPC_GPIOINT -> IO0IntEnR |=  (1 << JOY_UP);	
-				
-
-			break;
-			case IZQ:
-				LPC_GPIOINT -> IO0IntClr |= (1 << JOY_LF);
-				LPC_GPIOINT -> IO0IntEnR |= (1 << JOY_LF) ;
-				
-			break;
-		}
-		osSignalClear(id_state,00);
-		osSignalClear(id_state,S_ACTIVAR);
-	}
-}
-
-void rebote_Callback (void const *arg) {
-	osSignalSet(id_state,S_ACTIVAR);
-
-//tras terminar el timer
-	
-}
