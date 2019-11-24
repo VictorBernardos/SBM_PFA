@@ -5,7 +5,10 @@
 #include "lcd.h"
 #include "stdio.h"
 #include "joystick.h"
+#include "led_rgb.h"
+#include "buzzer.h"
 
+#define VALOR 1001;
 
 int Init_Thread(void);
 
@@ -16,3 +19,5 @@ osThreadDef (lcd, osPriorityNormal, 1, 0);
 void state(void const *argument);
 osThreadId id_state;
 osThreadDef (state, osPriorityNormal, 1, 0);
+
+void Init_gen(void);
