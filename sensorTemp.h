@@ -7,5 +7,5 @@
 #define SDA_Pin 27
 #define ADDR 0X90
 
-double getData();
+float getData(void);
 

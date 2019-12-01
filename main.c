@@ -14,6 +14,7 @@
 #include "SPI_LPC17xx.h"
 #include "Driver_SPI.h"
 #include "RTE_Device.h"
+#include "rs232.h"
 
 #define PORT_LED 1
 #define PIN_LED1 18
@@ -33,7 +34,14 @@ int main (void) {
   osKernelInitialize ();                    // initialize CMSIS-RTOS
 
   // initialize peripherals here
-  Init_gen();
+ 
+	Init_Joy();
+	Init_Thread();
+	Init_RGB();
+	Init_I2C();
+	Init_RS232();
+	Init_buzzer();
+  Init_adc_pot();
   osKernelStart ();                         // start thread execution 
 	
 	

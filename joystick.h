@@ -12,13 +12,14 @@
 
 
 //constantes para las señales
-#define IZQ 111
-#define CENTER 01
-#define SB 10
-#define BJ 11
-#define DCH 101
-#define L_CENTER 1000
-#define S_ACTIVAR 100
+#define IZQ 1
+#define CENTER 2
+#define SB 3
+#define BJ 4
+#define DCH 5
+#define L_CENTER 6
+#define S_ACTIVAR 7
+#define VALOR 8
 
 
 void rebote_Callback (void const *arg);

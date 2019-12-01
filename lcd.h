@@ -22,4 +22,5 @@ void reset_lcd(void);
 void empezar (void);
 int EscribeLetra_L1(uint8_t letra);
 int EscribeLetra_L2(uint8_t letra);
-
+void EscribeLinea(char buffer[]);
+void borrarBuffer(char msg[]);

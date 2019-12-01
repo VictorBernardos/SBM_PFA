@@ -5,6 +5,7 @@
 #include "SPI_LPC17xx.h"
 #include "Arial12x12.h"
 #include "lcd.h"
+#include "string.h"
 
 
 bool reseteado=false;
@@ -185,4 +186,18 @@ void empezar (void){
 	PosicionL1=0;
 	PosicionL2=256;
 }
+void EscribeLinea(char buffer[]){
 
+	for(int i=0;i<strlen(buffer);i++){
+    EscribeLetra_L1(buffer[i]);
+    
+	}
+}
+void borrarBuffer(char msg[]){
+	int i;
+	 for(i=0 ; i < 512; i++){
+      msg[i]= '\0';
+  }
+	 PosicionL1 = 0;
+	 PosicionL2 = 0;
+}
